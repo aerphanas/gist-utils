@@ -1,3 +1,23 @@
-#+TITLE: Gist
+#+TITLE: Github Gist utils
 
+gist on terminal, right now only github is supported
+
+* feature
+- get github gist list
+
+* compile
+
+#+BEGIN_SRC sh
+nimble -d:ssl -d:release build
+#+END_SRC
+
+* run with nimble
+
+#+BEGIN_SRC sh
 nimble -d:ssl run
+#+END_SRC
+
+* todo
+- [ ] use get options 
+- [ ] create new gist
+- [ ] read gist
