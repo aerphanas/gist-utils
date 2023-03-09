@@ -1,8 +1,10 @@
 # Gist utils
 
-[![asciicast](https://asciinema.org/a/k28htZzmKwBQx7CAd0l99tyuC.svg)](https://asciinema.org/a/k28htZzmKwBQx7CAd0l99tyuC)
+[![Build-Test](https://github.com/aerphanas/gist-utils/actions/workflows/main.yml/badge.svg)](https://github.com/aerphanas/gist-utils/actions/workflows/main.yml)
 
 gist on terminal
+
+[![asciicast](https://asciinema.org/a/k28htZzmKwBQx7CAd0l99tyuC.svg)](https://asciinema.org/a/k28htZzmKwBQx7CAd0l99tyuC)
 
 ## feature
 
