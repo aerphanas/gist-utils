@@ -1,6 +1,6 @@
 import std/json
 
-from HttpClient import newHttpClient, getContent
+from httpclient import newHttpClient, getContent
 from os import getAppFilename, extractFilename, commandLineParams
 from parseopt import OptParser, initOptParser, cmdLongOption, next
 from tables import OrderedTable, keys
