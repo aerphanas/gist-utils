@@ -1,4 +1,4 @@
-#+TITLE: Github Gist utils
+#+TITLE: Gist utils
 
 gist on terminal, right now only github is supported
 
