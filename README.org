@@ -18,6 +18,5 @@ nimble -d:ssl run
 #+END_SRC
 
 * todo
-- [ ] use get options 
 - [ ] create new gist
 - [ ] read gist
