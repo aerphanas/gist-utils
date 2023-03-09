@@ -1,18 +1,32 @@
-import std/[ httpclient, json, tables, os ]
+import std/json
+
+from HttpClient import newHttpClient, getContent
+from os import getAppFilename, extractFilename, commandLineParams
+from parseopt import OptParser, initOptParser, cmdLongOption, next
+from tables import OrderedTable, keys
 
 proc gGist(username: string)
 proc gHelp()
 
-
-# main section
 let input: seq[string] = commandLineParams()
 
 if input.len == 0:
   gHelp()
-else:
-  echo input
 
+var parser: OptParser = initOptParser(input)
+while true:
+  parser.next
+  case parser.kind:
+  of cmdLongOption:
+    if parser.key == "uname" and parser.val != "":
+        gGist(parser.val)
+    else:
+      gHelp()
+      break
+  else:
+    break
 
+# show all github gist
 proc gGist(username: string) =
   let  url: string = "https://api.github.com/users/" & username & "/gists"
   var  responseBody: string
@@ -21,6 +35,7 @@ proc gGist(username: string) =
     responseBody = newHttpClient().getContent(url)
   except:
     echo "Connection Error"
+    return
 
   let
     responseJson: JsonNode = responseBody.parseJson
@@ -35,7 +50,8 @@ proc gGist(username: string) =
 
       echo "description :\t", jsons["description"].getStr
       echo " - url      :\t", jsons["html_url"].getStr
-      echo " - public   :\t", jsons["public"].getBool
+      echo " - created  :\t", jsons["created_at"].getStr
+      echo " - updated  :\t", jsons["updated_at"].getStr
 
       stdout.write " - file     :\t"
       for i in jsKey.keys: stdout.write i, " "
@@ -43,6 +59,7 @@ proc gGist(username: string) =
       echo "\n"
   except:
     echo "NULL"
+    return
 
 proc gHelp() =
-  echo getAppFilename().extractFilename(), " -g/--get:<username>"
+  echo getAppFilename().extractFilename(), " --uname:<username>"
