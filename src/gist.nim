@@ -1,13 +1,13 @@
-import std/json
+import std/[ json, strutils ]
 
 from tables import OrderedTable, keys
 from httpcore import newHttpHeaders
-from httpclient import newHttpClient, getContent, request, HttpPost
+from httpclient import newHttpClient, getContent, request, HttpPost, body
 from parseopt import OptParser, initOptParser, cmdLongOption, cmdArgument, next
 from os import getAppFilename, extractFilename, commandLineParams, existsEnv, getEnv
 
 proc gGist(username: string)
-proc pGist(description: string, file: string)
+proc pGist(description: string, manyFile: string)
 proc gHelp()
 
 if commandLineParams().len == 0:
@@ -22,9 +22,11 @@ var
   state: bool
   option: char
 
+# Option Parser
 while true:
   parser.next
   case parser.kind:
+
   of cmdLongOption:
     if parser.key == "uname" and parser.val != "":
         option = 'g'
@@ -36,9 +38,11 @@ while true:
     else:
       gHelp()
       break
+
   of cmdArgument:
     if state:
       files = parser.key
+
   else:
     break
 
@@ -85,9 +89,7 @@ proc gGist(username: string) =
     echo "NULL"
     return
 
-#   -d '{"description":"Example of a gist","public":false,"files":{"README.md":{"content":"Hello World"}}}'
-
-proc pGist(description: string, file: string) =
+proc pGist(description: string, manyFile: string) =
   if not existsEnv("GITHUB_GIST_TOKEN"):
     echo "please set GITHUB_GIST_TOKEN"
     return
@@ -96,24 +98,29 @@ proc pGist(description: string, file: string) =
     url: string = "https://api.github.com/gists"
     acceptHeader: tuple[key: string, val: string] = (key: "Accept", val: "application/vnd.github+json")
     apiverHeader: tuple[key: string, val: string] = (key: "X-GitHub-Api-Version", val: "2022-11-28")
-    authHeader:   tuple[key: string, val: string] = (key: "Authorization", val: "Bearer " & getEnv("GITHUB_GIST_TOKEN"))
   let
+    authHeader:   tuple[key: string, val: string] = (key: "Authorization", val: "Bearer " & getEnv("GITHUB_GIST_TOKEN"))
     requestHeaders: array[3, tuple[key: string, val: string]] = [acceptHeader, authHeader, apiverHeader]
-    body = %*{
+    content: string = readFile(manyFile)
+    requestBody = %*{
       "description": description,
-      "public": false,
+      "public": true,
       "files": {
-        "README.md": {
-          "content" : "hello world"
+        manyFile: {
+          "content" : content
         }
       }
     }
-  var
-    requestJson = newHttpClient()
 
-  requestJson.headers = newHttpHeaders(requestHeaders)
-  let response = requestJson.request(url, HttpPost, $body)
-  echo response.status
+  try:
+    var requestJson = newHttpClient()
+    requestJson.headers = newHttpHeaders(requestHeaders)
+
+    let response = requestJson.request(url, HttpPost, $requestBody)
+    echo "Github Gist created on : " & response.body.parseJson["html_url"].getStr
+  except:
+    echo "Connection Error"
+    return
 
 proc gHelp() =
   echo getAppFilename().extractFilename(), " --uname:<username>"
