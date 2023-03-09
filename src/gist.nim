@@ -1,30 +1,54 @@
 import std/json
 
-from httpclient import newHttpClient, getContent
-from os import getAppFilename, extractFilename, commandLineParams
-from parseopt import OptParser, initOptParser, cmdLongOption, next
 from tables import OrderedTable, keys
+from httpcore import newHttpHeaders
+from httpclient import newHttpClient, getContent, request, HttpPost
+from parseopt import OptParser, initOptParser, cmdLongOption, cmdArgument, next
+from os import getAppFilename, extractFilename, commandLineParams, existsEnv, getEnv
 
 proc gGist(username: string)
+proc pGist(description: string, file: string)
 proc gHelp()
 
+if commandLineParams().len == 0:
+  gHelp() 
+
 let input: seq[string] = commandLineParams()
+var
+  parser: OptParser = initOptParser(input)
+  uname: string
+  descriptions: string
+  files: string
+  state: bool
+  option: char
 
-if input.len == 0:
-  gHelp()
-
-var parser: OptParser = initOptParser(input)
 while true:
   parser.next
   case parser.kind:
   of cmdLongOption:
     if parser.key == "uname" and parser.val != "":
-        gGist(parser.val)
+        option = 'g'
+        uname = parser.val
+    elif parser.key == "create" and parser.val != "":
+      option = 'c'
+      descriptions = parser.val
+      state = true
     else:
       gHelp()
       break
+  of cmdArgument:
+    if state:
+      files = parser.key
   else:
     break
+
+case option:
+of 'g':
+  gGist(uname)
+of 'c':
+  pGist(descriptions, files)
+else:
+  gHelp()
 
 # show all github gist
 proc gGist(username: string) =
@@ -60,6 +84,36 @@ proc gGist(username: string) =
   except:
     echo "NULL"
     return
+
+#   -d '{"description":"Example of a gist","public":false,"files":{"README.md":{"content":"Hello World"}}}'
+
+proc pGist(description: string, file: string) =
+  if not existsEnv("GITHUB_GIST_TOKEN"):
+    echo "please set GITHUB_GIST_TOKEN"
+    return
+
+  const
+    url: string = "https://api.github.com/gists"
+    acceptHeader: tuple[key: string, val: string] = (key: "Accept", val: "application/vnd.github+json")
+    apiverHeader: tuple[key: string, val: string] = (key: "X-GitHub-Api-Version", val: "2022-11-28")
+    authHeader:   tuple[key: string, val: string] = (key: "Authorization", val: "Bearer " & getEnv("GITHUB_GIST_TOKEN"))
+  let
+    requestHeaders: array[3, tuple[key: string, val: string]] = [acceptHeader, authHeader, apiverHeader]
+    body = %*{
+      "description": description,
+      "public": false,
+      "files": {
+        "README.md": {
+          "content" : "hello world"
+        }
+      }
+    }
+  var
+    requestJson = newHttpClient()
+
+  requestJson.headers = newHttpHeaders(requestHeaders)
+  let response = requestJson.request(url, HttpPost, $body)
+  echo response.status
 
 proc gHelp() =
   echo getAppFilename().extractFilename(), " --uname:<username>"
