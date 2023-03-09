@@ -1,7 +1,6 @@
 # Gist utils
 
-[![Build-Test](https://github.com/aerphanas/gist-utils/actions/workflows/main.yml/badge.svg)](https://github.com/aerphanas/gist-utils/actions/workflows/main.yml)
-
+[![Build-Test](https://github.com/aerphanas/gist-utils/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/aerphanas/gist-utils/actions/workflows/main.yml)  
 gist on terminal
 
 [![asciicast](https://asciinema.org/a/k28htZzmKwBQx7CAd0l99tyuC.svg)](https://asciinema.org/a/k28htZzmKwBQx7CAd0l99tyuC)
