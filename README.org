@@ -11,10 +11,10 @@ gist on terminal, right now only github is supported
 nimble -d:ssl -d:release build
 #+END_SRC
 
-* run with nimble
+* run
 
 #+BEGIN_SRC sh
-nimble -d:ssl run
+./gist --uname:aerphanas
 #+END_SRC
 
 * todo
