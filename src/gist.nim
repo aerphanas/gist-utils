@@ -1,7 +1,7 @@
 import gist/services
 
 from parseopt import OptParser, initOptParser, cmdLongOption, cmdArgument, next
-from os import commandLineParams
+from os import commandLineParams, existsEnv
 
 let input: seq[string] = commandLineParams()
 var
@@ -18,12 +18,15 @@ while true:
   case parser.kind:
   of cmdLongOption:
     if parser.key == "uname" and parser.val != "":
-        option = 'g'
-        uname = parser.val
+      option = 'g'
+      uname = parser.val
     elif parser.key == "create" and parser.val != "":
       option = 'c'
       descriptions = parser.val
-      state = true
+      state = true # for file
+    elif parser.key == "public" and parser.val != "":
+      option = 'p'
+      uname = parser.val
     else:
       break
   of cmdArgument:
@@ -34,8 +37,16 @@ while true:
 
 case option:
 of 'g':
-  gGist(uname)
+  if not existsEnv("GITHUB_GIST_TOKEN"):
+    echo "please set GITHUB_GIST_TOKEN"
+  else:
+    gGist(uname)
 of 'c':
-  pGist(descriptions, files)
+  if not existsEnv("GITHUB_GIST_TOKEN"):
+    echo "please set GITHUB_GIST_TOKEN"
+  else:
+    pGist(descriptions, files)
+of 'p':
+  pgGist(uname)
 else:
   gHelp()
