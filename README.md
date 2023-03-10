@@ -19,11 +19,13 @@ nimble build
 ## run
 
 ### list all public gist
+
 ``` sh
 ./gist --uname:aerphanas
 ```
 
 ### create new gist
+
 ```sh
 export GITHUB_GIST_TOKEN=<your token>
 ./gist --create:<description> <file>
