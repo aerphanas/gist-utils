@@ -15,10 +15,6 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: compile
         run: nimble build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: gist-bin
-          path: bin/gist
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
