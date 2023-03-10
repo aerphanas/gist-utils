@@ -5,7 +5,9 @@ author        = "Muhammad Aviv Burhanudin"
 description   = "Github Gist on terminal"
 license       = "BSD-3-Clause"
 srcDir        = "src"
+binDir        = "bin"
 bin           = @["gist"]
+
 
 
 # Dependencies

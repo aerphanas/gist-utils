@@ -11,7 +11,7 @@ gist on terminal
 ## compile
 
 ``` sh
-nimble -d:ssl -d:release build
+nimble build
 ```
 
 ## run
@@ -22,5 +22,4 @@ nimble -d:ssl -d:release build
 
 ## todo
 
-- [ ] create new gist
 - [ ] read gist
