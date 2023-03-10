@@ -7,17 +7,21 @@ from os import getAppFilename, extractFilename, existsEnv, getEnv
 
 const
   pUrl: string = "https://api.github.com/gists"
-  acceptHeader: tuple[key: string, val: string] = (key: "Accept", val: "application/vnd.github+json")
-  apiverHeader: tuple[key: string, val: string] = (key: "X-GitHub-Api-Version", val: "2022-11-28")
+  acceptHeader: tuple[key: string, val: string] = (key: "Accept",
+      val: "application/vnd.github+json")
+  apiverHeader: tuple[key: string, val: string] = (key: "X-GitHub-Api-Version",
+      val: "2022-11-28")
 
 let
-  authHeader:   tuple[key: string, val: string] = (key: "Authorization", val: "Bearer " & getEnv("GITHUB_GIST_TOKEN"))
-  requestHeaders: array[3, tuple[key: string, val: string]] = [acceptHeader, authHeader, apiverHeader]
+  authHeader: tuple[key: string, val: string] = (key: "Authorization",
+      val: "Bearer " & getEnv("GITHUB_GIST_TOKEN"))
+  requestHeaders: array[3, tuple[key: string, val: string]] = [acceptHeader,
+      authHeader, apiverHeader]
 
 # GET Public Gist
 proc pgGist*(username: string) =
-  let  url: string = "https://api.github.com/users/" & username & "/gists"
-  var  responseBody: string
+  let url: string = "https://api.github.com/users/" & username & "/gists"
+  var responseBody: string
 
   try:
     responseBody = newHttpClient().getContent(url)
@@ -30,8 +34,7 @@ proc pgGist*(username: string) =
     responseLength: int = responseJson.len
 
   try:
-    # Printing all key that important
-    for i in 0 .. responseLength - 1 :
+    for i in 0 .. responseLength - 1:
       let
         jsons: JsonNode = responseJson[i]
         jsKey: OrderedTable[string, JsonNode] = jsons["files"].getFields
@@ -52,8 +55,9 @@ proc pgGist*(username: string) =
 
 # GET Private Gist
 proc gGist*(username: string) =
-  var responseBody: string
-  var connection = newHttpClient()
+  var
+    responseBody: string
+    connection = newHttpClient()
   connection.headers = newHttpHeaders(requestHeaders)
 
   try:
@@ -67,13 +71,14 @@ proc gGist*(username: string) =
     responseLength: int = responseJson.len
 
   try:
-    for i in 0 .. responseLength - 1 :
+    for i in 0 .. responseLength - 1:
       let
         jsons: JsonNode = responseJson[i]
         jsKey: OrderedTable[string, JsonNode] = jsons["files"].getFields
 
       echo "description   : ", jsons["description"].getStr
-      echo " - visibility : ", if jsons["public"].getBool: "public" else: "private"
+      echo " - visibility : ", if jsons[
+          "public"].getBool: "public" else: "private"
       echo " - web url    : ", jsons["html_url"].getStr
       echo " - git url    : ", jsons["git_pull_url"].getStr
       echo " - created    : ", jsons["created_at"].getStr
@@ -96,9 +101,9 @@ proc pGist*(description: string, manyFile: string) =
       "public": true,
       "files": {
         manyFile: {
-          "content" : content
-        }
+          "content": content
       }
+    }
     }
 
   try:
@@ -117,5 +122,6 @@ proc gHelp*() =
   echo "Copyright (c) 2023 by aerphanas\n"
   echo getAppFilename().extractFilename(), " [Options]"
   echo "\nOptions:"
-  echo "\t--uname:GITHUB_USERNAME", "\t\tshow all public github gist item"
-  echo "\t--create:DESCRIPTION FILENAME", "\tcreate github gist with description and file"
+  echo "  --public:GITHUB_USERNAME", "\tshow all public github gist item"
+  echo "  --uname:GITHUB_USERNAME", "\tshow all github gist item (need github token)"
+  echo "  --create:DESCRIPTION FILENAME", "\tcreate github gist with description and file (need github token)"
